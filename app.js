@@ -40,7 +40,13 @@
 
   const participants = [
     { name: "Arthur", color: "bg-blue-500 text-white" },
-    { name: "Caio", color: "bg-orange-500 text-white" },
+    { name: "Glauber", color: "bg-emerald-500 text-white" },
+    { name: "Lucas", color: "bg-purple-600 text-white" },
+  ];
+
+  const rotationPattern = [
+    { name: "Arthur", color: "bg-blue-500 text-white" },
+    null,
     { name: "Glauber", color: "bg-emerald-500 text-white" },
     { name: "Lucas", color: "bg-purple-600 text-white" },
   ];
@@ -76,12 +82,14 @@
       let weekIndex = 0;
       while (d.getFullYear() <= 2026) {
         for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
-          const currentPerson = participants[(weekIndex + dayOffset) % participants.length];
-          const currentDayDate = new Date(d);
-          currentDayDate.setDate(d.getDate() + dayOffset);
-          const dateStr = currentDayDate.toISOString().split("T")[0];
-          if (!allEvents[dateStr]) allEvents[dateStr] = [];
-          allEvents[dateStr].push(currentPerson);
+          const currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+          if (currentPerson) {
+            const currentDayDate = new Date(d);
+            currentDayDate.setDate(d.getDate() + dayOffset);
+            const dateStr = currentDayDate.toISOString().split("T")[0];
+            if (!allEvents[dateStr]) allEvents[dateStr] = [];
+            allEvents[dateStr].push(currentPerson);
+          }
         }
         const friday = new Date(d);
         friday.setDate(d.getDate() + 4);

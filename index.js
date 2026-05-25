@@ -15,9 +15,15 @@ const App = () => {
   // Configuração dos participantes em Ordem Alfabética para a primeira semana
   const participants = [
     { name: "Arthur", color: "bg-blue-500 text-white" },
-    { name: "Caio", color: "bg-orange-500 text-white" },
     { name: "Glauber", color: "bg-emerald-500 text-white" },
     { name: "Lucas", color: "bg-purple-600 text-white" }, // Lucas deve ser Purple
+  ];
+
+  const rotationPattern = [
+    { name: "Arthur", color: "bg-blue-500 text-white" },
+    null,
+    { name: "Glauber", color: "bg-emerald-500 text-white" },
+    { name: "Lucas", color: "bg-purple-600 text-white" },
   ];
 
   const fixedParticipant = {
@@ -48,15 +54,17 @@ const App = () => {
       for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
         // dayOffset 0 = Segunda, 1 = Terça, 2 = Quarta, 3 = Quinta
         const currentPerson =
-          participants[(weekIndex + dayOffset) % participants.length];
+          rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
 
-        // Clona a data base (Segunda) e adiciona o offset
-        const currentDayDate = new Date(d);
-        currentDayDate.setDate(d.getDate() + dayOffset);
+        if (currentPerson) {
+          // Clona a data base (Segunda) e adiciona o offset
+          const currentDayDate = new Date(d);
+          currentDayDate.setDate(d.getDate() + dayOffset);
 
-        const dateStr = currentDayDate.toISOString().split("T")[0];
-        if (!allEvents[dateStr]) allEvents[dateStr] = [];
-        allEvents[dateStr].push(currentPerson);
+          const dateStr = currentDayDate.toISOString().split("T")[0];
+          if (!allEvents[dateStr]) allEvents[dateStr] = [];
+          allEvents[dateStr].push(currentPerson);
+        }
       }
 
       // 3. Adicionar Leandro na Sexta-feira desta semana
@@ -298,7 +306,7 @@ const App = () => {
                   Semana 1
                 </span>
                 <span>
-                  Ordem Alfabética: Arthur (Seg), Caio (Ter), Glauber (Qua),
+                  Ordem Alfabética: Arthur (Seg), Glauber (Qua),
                   Lucas (Qui).
                 </span>
               </li>
