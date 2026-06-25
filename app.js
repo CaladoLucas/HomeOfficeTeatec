@@ -82,7 +82,18 @@
       let weekIndex = 0;
       while (d.getFullYear() <= 2026) {
         for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
-          const currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+          let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+
+          // Inverter home office de Lucas e Glauber nas semanas de 29/06/2026 e 06/07/2026
+          const mondayStr = d.toISOString().split("T")[0];
+          if (mondayStr === "2026-06-29" || mondayStr === "2026-07-06") {
+            if (currentPerson && currentPerson.name === "Lucas") {
+              currentPerson = rotationPattern.find(function (p) { return p && p.name === "Glauber"; });
+            } else if (currentPerson && currentPerson.name === "Glauber") {
+              currentPerson = rotationPattern.find(function (p) { return p && p.name === "Lucas"; });
+            }
+          }
+
           if (currentPerson) {
             const currentDayDate = new Date(d);
             currentDayDate.setDate(d.getDate() + dayOffset);

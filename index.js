@@ -53,8 +53,18 @@ const App = () => {
 
       for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
         // dayOffset 0 = Segunda, 1 = Terça, 2 = Quarta, 3 = Quinta
-        const currentPerson =
+        let currentPerson =
           rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+
+        // Inverter home office de Lucas e Glauber nas semanas de 29/06/2026 e 06/07/2026
+        const mondayStr = d.toISOString().split("T")[0];
+        if (mondayStr === "2026-06-29" || mondayStr === "2026-07-06") {
+          if (currentPerson && currentPerson.name === "Lucas") {
+            currentPerson = rotationPattern.find((p) => p && p.name === "Glauber");
+          } else if (currentPerson && currentPerson.name === "Glauber") {
+            currentPerson = rotationPattern.find((p) => p && p.name === "Lucas");
+          }
+        }
 
         if (currentPerson) {
           // Clona a data base (Segunda) e adiciona o offset
