@@ -78,11 +78,32 @@
 
     const events = useMemo(function () {
       const allEvents = {};
+      const extraDays = { Arthur: 0, Glauber: 0, Lucas: 0 };
+      const fillStart = new Date(2026, 9, 12);
       let d = new Date(2026, 1, 23);
       let weekIndex = 0;
       while (d.getFullYear() <= 2026) {
         for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
-          const currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+          let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+
+          // Preenche apenas a vaga, preservando os dias originais da escala.
+          if (!currentPerson && d >= fillStart) {
+            const previousPerson = dayOffset > 0
+              ? rotationPattern[(weekIndex + dayOffset - 1) % rotationPattern.length]
+              : null;
+            const nextPerson = dayOffset < 3
+              ? rotationPattern[(weekIndex + dayOffset + 1) % rotationPattern.length]
+              : fixedParticipant;
+            const eligible = participants.filter(function (person) {
+              return person.name !== (previousPerson && previousPerson.name) &&
+                person.name !== (nextPerson && nextPerson.name);
+            });
+            // Menos extras primeiro; empates seguem Arthur, Glauber, Lucas.
+            currentPerson = eligible.reduce(function (selected, person) {
+              return extraDays[person.name] < extraDays[selected.name] ? person : selected;
+            });
+            extraDays[currentPerson.name]++;
+          }
           if (currentPerson) {
             const currentDayDate = new Date(d);
             currentDayDate.setDate(d.getDate() + dayOffset);

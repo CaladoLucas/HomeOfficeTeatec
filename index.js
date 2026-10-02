@@ -34,7 +34,8 @@ const App = () => {
   // Função para gerar eventos do ano inteiro
   const events = useMemo(() => {
     const allEvents = {};
-    const startYear = 2026;
+    const extraDays = { Arthur: 0, Glauber: 0, Lucas: 0 };
+    const fillStart = new Date(2026, 9, 12);
 
     // Data de início do projeto: Próxima semana (considerando data atual simulada 19/02/2026 -> Prox Seg é 23/02/2026)
     // Vamos fixar o início na Segunda-feira, 23 de Fevereiro de 2026
@@ -48,13 +49,31 @@ const App = () => {
       // Gera os dias da semana (Segunda a Quinta)
       // Lógica: Para garantir que quem fez Segunda faça Quinta na próxima, e ordem alfabética na primeira,
       // usamos uma janela deslizante sobre o array ordenado.
-      // Semana 0: Seg(A), Ter(C), Qua(G), Qui(L)
-      // Semana 1: Seg(C), Ter(G), Qua(L), Qui(A) -> Note que A (Seg Sem0) virou Qui Sem1. Regra atendida.
+      // Semana 0: Seg(A), Ter(vaga), Qua(G), Qui(L)
+      // Semana 1: Seg(vaga), Ter(G), Qua(L), Qui(A).
 
       for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
         // dayOffset 0 = Segunda, 1 = Terça, 2 = Quarta, 3 = Quinta
-        const currentPerson =
-          rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+        let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+
+        // Preenche apenas a vaga, preservando os dias originais da escala.
+        if (!currentPerson && d >= fillStart) {
+          const previousPerson = dayOffset > 0
+            ? rotationPattern[(weekIndex + dayOffset - 1) % rotationPattern.length]
+            : null;
+          const nextPerson = dayOffset < 3
+            ? rotationPattern[(weekIndex + dayOffset + 1) % rotationPattern.length]
+            : fixedParticipant;
+          const eligible = participants.filter(function (person) {
+            return person.name !== (previousPerson && previousPerson.name) &&
+              person.name !== (nextPerson && nextPerson.name);
+          });
+          // Menos extras primeiro; empates seguem Arthur, Glauber, Lucas.
+          currentPerson = eligible.reduce(function (selected, person) {
+            return extraDays[person.name] < extraDays[selected.name] ? person : selected;
+          });
+          extraDays[currentPerson.name]++;
+        }
 
         if (currentPerson) {
           // Clona a data base (Segunda) e adiciona o offset
@@ -327,8 +346,10 @@ const App = () => {
                   Equilíbrio
                 </span>
                 <span>
-                  Todos fazem exatamente 1 dia de Home Office por semana (Seg a
-                  Qui).
+                  A partir de 12/10/2026, a vaga de segunda a quinta é preenchida
+                  por quem recebeu menos dias extras e não fica em dias seguidos
+                  de Home Office. Empates seguem Arthur, Glauber e Lucas,
+                  começando por Arthur em 12/10.
                 </span>
               </li>
             </ul>
