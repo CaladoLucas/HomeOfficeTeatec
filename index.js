@@ -36,6 +36,8 @@ const App = () => {
     const allEvents = {};
     const extraDays = { Arthur: 0, Glauber: 0, Lucas: 0 };
     const fillStart = new Date(2026, 9, 12);
+    // Datas sem ninguém em Home Office (não consomem vaga nem dias extras).
+    const noHomeOfficeDates = ["2026-10-13"];
 
     // Data de início do projeto: Próxima semana (considerando data atual simulada 19/02/2026 -> Prox Seg é 23/02/2026)
     // Vamos fixar o início na Segunda-feira, 23 de Fevereiro de 2026
@@ -54,7 +56,10 @@ const App = () => {
 
       for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
         // dayOffset 0 = Segunda, 1 = Terça, 2 = Quarta, 3 = Quinta
-        let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+        const skipDate = new Date(d);
+      skipDate.setDate(d.getDate() + dayOffset);
+      if (noHomeOfficeDates.includes(skipDate.toISOString().split("T")[0])) continue;
+      let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
 
         // Preenche apenas a vaga, preservando os dias originais da escala.
         if (!currentPerson && d >= fillStart) {

@@ -40,7 +40,9 @@ for (const file of ['app.js', 'index.js']) {
         const expected = day === 4 ? 'Leandro' : pattern[(week + day) % 4];
         const actual = events[key]?.[0]?.name;
         names.push(actual);
-        if (expected || key < '2026-10-12') {
+        if (key === '2026-10-13') {
+          assert.equal(actual, undefined, key);
+        } else if (expected || key < '2026-10-12') {
           assert.equal(actual, expected || undefined, key);
         } else {
           const eligible = Object.keys(extras).filter(name =>

@@ -80,11 +80,16 @@
       const allEvents = {};
       const extraDays = { Arthur: 0, Glauber: 0, Lucas: 0 };
       const fillStart = new Date(2026, 9, 12);
+      // Datas sem ninguém em Home Office (não consomem vaga nem dias extras).
+      const noHomeOfficeDates = ["2026-10-13"];
       let d = new Date(2026, 1, 23);
       let weekIndex = 0;
       while (d.getFullYear() <= 2026) {
         for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
-          let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+          const skipDate = new Date(d);
+        skipDate.setDate(d.getDate() + dayOffset);
+        if (noHomeOfficeDates.includes(skipDate.toISOString().split("T")[0])) continue;
+        let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
 
           // Preenche apenas a vaga, preservando os dias originais da escala.
           if (!currentPerson && d >= fillStart) {
