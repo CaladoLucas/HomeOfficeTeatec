@@ -44,12 +44,16 @@
     { name: "Lucas", color: "bg-purple-600 text-white" },
   ];
 
+  // Lógica antiga (anterior à data de corte).
   const rotationPattern = [
     { name: "Arthur", color: "bg-blue-500 text-white" },
     null,
     { name: "Glauber", color: "bg-emerald-500 text-white" },
     { name: "Lucas", color: "bg-purple-600 text-white" },
   ];
+
+  // A regra nova de rodízio vale só a partir desta segunda; antes disso vale a escala antiga.
+  const NEW_RULE_START = new Date(2026, 9, 19);
 
   const fixedParticipant = { name: "Leandro", color: "bg-slate-600 text-white" };
 
@@ -78,43 +82,63 @@
 
     const events = useMemo(function () {
       const allEvents = {};
+      // Regra: seg-qui = rodízio contínuo Glauber, Lucas, Arthur (um por dia, sem reiniciar entre semanas).
+      // Sexta = Leandro sempre. Âncora: segunda 19/10/2026 = Glauber.
+      // Dia sem home office (noHomeOfficeDates) fica vazio, mas conta no rodízio (a ordem segue o calendário).
+      const order = [
+        { name: "Glauber", color: "bg-emerald-500 text-white" },
+        { name: "Lucas", color: "bg-purple-600 text-white" },
+        { name: "Arthur", color: "bg-blue-500 text-white" },
+      ];
+      const anchor = NEW_RULE_START;
       const extraDays = { Arthur: 0, Glauber: 0, Lucas: 0 };
       const fillStart = new Date(2026, 9, 12);
-      // Datas sem ninguém em Home Office (não consomem vaga nem dias extras).
       const noHomeOfficeDates = ["2026-10-13"];
+      const dayMs = 24 * 3600 * 1000;
       let d = new Date(2026, 1, 23);
       let weekIndex = 0;
       while (d.getFullYear() <= 2026) {
-        for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
-          const skipDate = new Date(d);
-        skipDate.setDate(d.getDate() + dayOffset);
-        if (noHomeOfficeDates.includes(skipDate.toISOString().split("T")[0])) continue;
-        let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
-
-          // Preenche apenas a vaga, preservando os dias originais da escala.
-          if (!currentPerson && d >= fillStart) {
-            const previousPerson = dayOffset > 0
-              ? rotationPattern[(weekIndex + dayOffset - 1) % rotationPattern.length]
-              : null;
-            const nextPerson = dayOffset < 3
-              ? rotationPattern[(weekIndex + dayOffset + 1) % rotationPattern.length]
-              : fixedParticipant;
-            const eligible = participants.filter(function (person) {
-              return person.name !== (previousPerson && previousPerson.name) &&
-                person.name !== (nextPerson && nextPerson.name);
-            });
-            // Menos extras primeiro; empates seguem Arthur, Glauber, Lucas.
-            currentPerson = eligible.reduce(function (selected, person) {
-              return extraDays[person.name] < extraDays[selected.name] ? person : selected;
-            });
-            extraDays[currentPerson.name]++;
+        const weeks = Math.round((d - anchor) / (7 * dayMs));
+        if (d < NEW_RULE_START) {
+          for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
+            const skipDate = new Date(d);
+            skipDate.setDate(d.getDate() + dayOffset);
+            if (noHomeOfficeDates.includes(skipDate.toISOString().split("T")[0])) continue;
+            let currentPerson = rotationPattern[(weekIndex + dayOffset) % rotationPattern.length];
+            if (!currentPerson && d >= fillStart) {
+              const previousPerson = dayOffset > 0
+                ? rotationPattern[(weekIndex + dayOffset - 1) % rotationPattern.length]
+                : null;
+              const nextPerson = dayOffset < 3
+                ? rotationPattern[(weekIndex + dayOffset + 1) % rotationPattern.length]
+                : fixedParticipant;
+              const eligible = participants.filter(function (person) {
+                return person.name !== (previousPerson && previousPerson.name) &&
+                  person.name !== (nextPerson && nextPerson.name);
+              });
+              currentPerson = eligible.reduce(function (selected, person) {
+                return extraDays[person.name] < extraDays[selected.name] ? person : selected;
+              });
+              extraDays[currentPerson.name]++;
+            }
+            if (currentPerson) {
+              const currentDayDate = new Date(d);
+              currentDayDate.setDate(d.getDate() + dayOffset);
+              const dateStr = currentDayDate.toISOString().split("T")[0];
+              if (!allEvents[dateStr]) allEvents[dateStr] = [];
+              allEvents[dateStr].push(currentPerson);
+            }
           }
-          if (currentPerson) {
-            const currentDayDate = new Date(d);
-            currentDayDate.setDate(d.getDate() + dayOffset);
-            const dateStr = currentDayDate.toISOString().split("T")[0];
+        } else {
+          for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
+            const day = new Date(d);
+            day.setDate(d.getDate() + dayOffset);
+            const dateStr = day.toISOString().split("T")[0];
+            if (noHomeOfficeDates.includes(dateStr)) continue;
+            const idx = weeks * 4 + dayOffset;
+            const person = order[((idx % 3) + 3) % 3];
             if (!allEvents[dateStr]) allEvents[dateStr] = [];
-            allEvents[dateStr].push(currentPerson);
+            allEvents[dateStr].push(person);
           }
         }
         const friday = new Date(d);
