@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+  <defs>
+    <clipPath id="pride-cal-body">
+      <rect x="2.5" y="3.5" width="19" height="18" rx="3.5" />
+    </clipPath>
+    <linearGradient id="cal-header-shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.06" />
+    </linearGradient>
+  </defs>
+
+  <!-- Calendar Body with 6 LGBT Pride Stripes -->
+  <g clip-path="url(#pride-cal-body)">
+    <!-- Red (Vermelho) -->
+    <rect x="2" y="3.5" width="20" height="3" fill="#E40303" />
+    <!-- Orange (Laranja) -->
+    <rect x="2" y="6.5" width="20" height="3" fill="#FF8C00" />
+    <!-- Yellow (Amarelo) -->
+    <rect x="2" y="9.5" width="20" height="3" fill="#FFED00" />
+    <!-- Green (Verde) -->
+    <rect x="2" y="12.5" width="20" height="3" fill="#008026" />
+    <!-- Blue (Azul) -->
+    <rect x="2" y="15.5" width="20" height="3" fill="#004DFF" />
+    <!-- Violet (Violeta) -->
+    <rect x="2" y="18.5" width="20" height="3" fill="#750787" />
+
+    <!-- Top Header Shade & Divider Line -->
+    <rect x="2" y="3.5" width="20" height="5.5" fill="url(#cal-header-shade)" />
+    <line x1="2" y1="9" x2="22" y2="9" stroke="rgba(255,255,255,0.45)" stroke-width="0.6" stroke-linecap="round" />
+
+    <!-- Calendar Day Grid (3 columns x 2 rows, high contrast frosted cells) -->
+    <g fill="#FFFFFF" fill-opacity="0.95" stroke="rgba(15,23,42,0.18)" stroke-width="0.35">
+      <rect x="4.8" y="11.2" width="3.8" height="3.2" rx="0.8" />
+      <rect x="10.1" y="11.2" width="3.8" height="3.2" rx="0.8" />
+      <rect x="15.4" y="11.2" width="3.8" height="3.2" rx="0.8" />
+      <rect x="4.8" y="16.0" width="3.8" height="3.2" rx="0.8" />
+      <rect x="10.1" y="16.0" width="3.8" height="3.2" rx="0.8" />
+      <rect x="15.4" y="16.0" width="3.8" height="3.2" rx="0.8" />
+    </g>
+  </g>
+
+  <!-- Outer Calendar Border for Contrast & Sharpness -->
+  <rect x="2.5" y="3.5" width="19" height="18" rx="3.5" fill="none" stroke="rgba(15,23,42,0.2)" stroke-width="0.75" />
+
+  <!-- Top Binder Rings / Loops -->
+  <rect x="6.5" y="1.5" width="2.2" height="4.2" rx="1.1" fill="#FFFFFF" stroke="#334155" stroke-width="0.6" />
+  <rect x="15.3" y="1.5" width="2.2" height="4.2" rx="1.1" fill="#FFFFFF" stroke="#334155" stroke-width="0.6" />
+</svg>
